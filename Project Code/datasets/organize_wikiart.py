@@ -30,7 +30,7 @@ for i in range(len(genre_train)):
     
 for i in range(len(genre_val)):
     input_file = os.path.join(input_dir + input_folder, genre_val.iloc[i, 0])
-    output_file = os.path.join(output_dir + output_train, os.path.basename(genre_val.iloc[i, 0]))
+    output_file = os.path.join(output_dir + output_val, os.path.basename(genre_val.iloc[i, 0]))
     if os.path.isfile(output_file):
         print(output_file)
     else:
