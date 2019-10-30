@@ -39,7 +39,7 @@ class Pix2pixDataset(BaseDataset):
         self.image_paths = image_paths
         self.instance_paths = instance_paths
 
-        size = len(self.label_paths)
+        size = len(self.image_paths)
         self.dataset_size = size
 
     def get_paths(self, opt):
