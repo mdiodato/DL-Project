@@ -20,18 +20,24 @@ genre_map = pd.read_csv(input_dir + input_csv_folder + 'genre_class.txt', header
 genre_train = pd.read_csv(input_dir + input_csv_folder + 'genre_train.csv')
 genre_val = pd.read_csv(input_dir + input_csv_folder + 'genre_val.csv')
 
+types_include = list(genre_map.iloc[:,1])
+types_include = ['cityscape', 'landscape']
+ids_include = list(genre_map[genre_map[1].isin(types_include)][0])
+
 for i in range(len(genre_train)):
     input_file = os.path.join(input_dir + input_folder, genre_train.iloc[i, 0])
     output_file = os.path.join(output_dir + output_train, os.path.basename(genre_train.iloc[i, 0]))
-    if os.path.isfile(output_file):
-        print(output_file)
-    else:
-        shutil.copyfile(input_file, output_file) 
+    if genre_train.iloc[i, 1] in ids_include:
+        if os.path.isfile(output_file):
+            print(output_file)
+        else:
+            shutil.copyfile(input_file, output_file) 
     
 for i in range(len(genre_val)):
     input_file = os.path.join(input_dir + input_folder, genre_val.iloc[i, 0])
     output_file = os.path.join(output_dir + output_val, os.path.basename(genre_val.iloc[i, 0]))
-    if os.path.isfile(output_file):
-        print(output_file)
-    else:
-        shutil.copyfile(input_file, output_file) 
+    if genre_val.iloc[i, 1] in ids_include:
+        if os.path.isfile(output_file):
+            print(output_file)
+        else:
+            shutil.copyfile(input_file, output_file) 
