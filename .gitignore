@@ -1,4 +1,4 @@
 **/*.jpg
 **/*.png
 **/*.zip
-wikiart-master/**.json
+wikiart-master/**/*.json
