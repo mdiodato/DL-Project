@@ -10,6 +10,7 @@ import shutil
 import time
 import urllib.error
 import urllib.request
+import random
 
 import requests
 
@@ -103,6 +104,9 @@ class WikiArtFetcher:
         if os.path.exists(path) and not self.override:
             with open(path, encoding='utf-8') as f:
                 self.artists = json.load(f)
+                
+                #random.shuffle(self.artists)
+                #self.artists = {k:self.artists[k] for k in keys}
 
             Logger.info('skipped')
             return self
@@ -137,7 +141,7 @@ class WikiArtFetcher:
 
         self.painting_groups = []
         show_progress_at = max(1, int(.1 * len(self.artists)))
-
+        
         # Retrieve paintings' metadata for every artist.
         for i, artist in enumerate(self.artists):
             self.painting_groups.append(self.fetch_paintings(artist))
@@ -225,39 +229,45 @@ class WikiArtFetcher:
         Logger.write('|- %s' % painting.get('url', painting.get('contentId')),
                      end=' ', flush=True)
         elapsed = time.time()
-        url = painting['image']
-        # Remove label "!Large.jpg".
-        url = ''.join(url.split('!')[:-1])
-        filename = os.path.join(settings.BASE_FOLDER,
-                                'images',
-                                painting['artistUrl'],
-                                str(painting['completitionYear']) if painting['completitionYear'] else 'unknown-year',
-                                str(painting['contentId']) +
-                                settings.SAVE_IMAGES_IN_FORMAT)
-
-        if os.path.exists(filename) and not self.override:
-            Logger.write('(s)')
-            return self
-
-        os.makedirs(os.path.dirname(filename), exist_ok=True)
-
         try:
-            # Save image.
-            self.padder.request_start()
-            response = requests.get(url, stream=True,
-                                    timeout=settings.PAINTINGS_REQUEST_TIMEOUT)
-            self.padder.request_finished()
+            url = painting['image']
+            # Remove label "!Large.jpg".
+            url = ''.join(url.split('!')[:-1])
+        
+            filename = os.path.join(settings.BASE_FOLDER,
+                                    'images',
+                                    painting['artistUrl'],
+                                    str(painting['completitionYear']) if painting['completitionYear'] else 'unknown-year',
+                                    str(painting['contentId']) +
+                                    settings.SAVE_IMAGES_IN_FORMAT)
+            if os.path.exists(filename) and not self.override:
+                Logger.write('(s)')
+                return self
 
-            response.raise_for_status()
+            os.makedirs(os.path.dirname(filename), exist_ok=True)
+            
+            try:
+                # Save image.
+                self.padder.request_start()
+                response = requests.get(url, stream=True,
+                                        timeout=settings.PAINTINGS_REQUEST_TIMEOUT)
+                self.padder.request_finished()
 
-            with open(filename, 'wb') as f:
-                response.raw.decode_content = True
-                shutil.copyfileobj(response.raw, f)
+                response.raise_for_status()
 
-            Logger.write('(%.2f sec)' % (time.time() - elapsed))
+                with open(filename, 'wb') as f:
+                    response.raw.decode_content = True
+                    shutil.copyfileobj(response.raw, f)
 
+                Logger.write('(%.2f sec)' % (time.time() - elapsed))
+
+            except Exception as error:
+                Logger.write('%s' % str(error))
+                if os.path.exists(filename): os.remove(filename)
         except Exception as error:
             Logger.write('%s' % str(error))
-            if os.path.exists(filename): os.remove(filename)
+            
+
+        
 
         return self
