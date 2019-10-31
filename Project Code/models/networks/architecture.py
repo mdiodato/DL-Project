@@ -40,26 +40,28 @@ class SPADEResnetBlock(nn.Module):
 
         # define normalization layers
         spade_config_str = opt.norm_G.replace('spectral', '')
-        self.norm_0 = SPADE(spade_config_str, fin, opt.semantic_nc)
-        self.norm_1 = SPADE(spade_config_str, fmiddle, opt.semantic_nc)
+        # FEATURE: Replace opt.semantic_nc with opt.feature_nc
+        self.norm_0 = SPADE(spade_config_str, fin, opt.feature_nc)
+        self.norm_1 = SPADE(spade_config_str, fmiddle, opt.feature_nc)
         if self.learned_shortcut:
-            self.norm_s = SPADE(spade_config_str, fin, opt.semantic_nc)
+            self.norm_s = SPADE(spade_config_str, fin, opt.feature_nc)
 
     # note the resnet block with SPADE also takes in |seg|,
     # the semantic segmentation map as input
-    def forward(self, x, seg):
-        x_s = self.shortcut(x, seg)
+    # FEATURE: the semantic segmentation map "seg" is replaced with the feature map "feature"
+    def forward(self, x, feature):
+        x_s = self.shortcut(x, feature)
 
-        dx = self.conv_0(self.actvn(self.norm_0(x, seg)))
-        dx = self.conv_1(self.actvn(self.norm_1(dx, seg)))
+        dx = self.conv_0(self.actvn(self.norm_0(x, feature)))
+        dx = self.conv_1(self.actvn(self.norm_1(dx, feature)))
 
         out = x_s + dx
 
         return out
 
-    def shortcut(self, x, seg):
+    def shortcut(self, x, feature):
         if self.learned_shortcut:
-            x_s = self.conv_s(self.norm_s(x, seg))
+            x_s = self.conv_s(self.norm_s(x, feature))
         else:
             x_s = x
         return x_s
@@ -120,4 +122,47 @@ class VGG19(torch.nn.Module):
         h_relu4 = self.slice4(h_relu3)
         h_relu5 = self.slice5(h_relu4)
         out = [h_relu1, h_relu2, h_relu3, h_relu4, h_relu5]
+        return out
+
+
+# VGG architecter, used for creating feature maps for SPADE blocks.
+class VGG19Features(torch.nn.Module):
+    def __init__(self, requires_grad=False):
+        super().__init__()
+        vgg_pretrained_features = torchvision.models.vgg19(pretrained=True).features
+        self.slice1 = torch.nn.Sequential()
+        self.slice2 = torch.nn.Sequential()
+        self.slice3 = torch.nn.Sequential()
+        self.slice4 = torch.nn.Sequential()
+        self.slice5 = torch.nn.Sequential()
+        self.slice6 = torch.nn.Sequential()
+        self.slice7 = torch.nn.Sequential()
+        for x in range(2):
+            self.slice1.add_module(str(x), vgg_pretrained_features[x])
+        for x in range(2, 7):
+            self.slice2.add_module(str(x), vgg_pretrained_features[x])
+        for x in range(7, 12):
+            self.slice3.add_module(str(x), vgg_pretrained_features[x])
+        for x in range(12, 16):
+            self.slice4.add_module(str(x), vgg_pretrained_features[x])
+        for x in range(16, 21):
+            self.slice5.add_module(str(x), vgg_pretrained_features[x])
+        for x in range(21, 25):
+            self.slice6.add_module(str(x), vgg_pretrained_features[x])
+        for x in range(25, 30):
+            self.slice7.add_module(str(x), vgg_pretrained_features[x])
+        if not requires_grad:
+            for param in self.parameters():
+                param.requires_grad = False
+        self.feature_nc = [64, 128, 256, 256, 512, 512, 512]
+
+    def forward(self, X):
+        h_relu1 = self.slice1(X)  # 3 -> 64
+        h_relu2 = self.slice2(h_relu1)  # 64 -> 128
+        h_relu3 = self.slice3(h_relu2)  # 128 -> 256
+        h_relu4 = self.slice4(h_relu3)  # 256 -> 256
+        h_relu5 = self.slice5(h_relu4)  # 256 -> 512
+        h_relu6 = self.slice6(h_relu5)  # 512 -> 512
+        h_relu7 = self.slice7(h_relu6)  # 512 -> 512
+        out = [h_relu1, h_relu2, h_relu3, h_relu4, h_relu5, h_relu6, h_relu7]
         return out

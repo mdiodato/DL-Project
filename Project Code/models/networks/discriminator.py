@@ -100,11 +100,13 @@ class NLayerDiscriminator(BaseNetwork):
             self.add_module('model' + str(n), nn.Sequential(*sequence[n]))
 
     def compute_D_input_nc(self, opt):
-        input_nc = opt.label_nc + opt.output_nc
-        if opt.contain_dontcare_label:
-            input_nc += 1
-        if not opt.no_instance:
-            input_nc += 1
+        # input_nc = opt.label_nc + opt.output_nc
+        # if opt.contain_dontcare_label:
+        #     input_nc += 1
+        # if not opt.no_instance:
+        #     input_nc += 1
+        # FEATURE: no label_nc, no concatenation
+        input_nc = opt.output_nc
         return input_nc
 
     def forward(self, input):

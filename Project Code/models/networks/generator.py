@@ -26,6 +26,7 @@ class SPADEGenerator(BaseNetwork):
         super().__init__()
         self.opt = opt
         nf = opt.ngf
+        feature_nc = [64, 128, 256, 256, 512, 512, 512]
 
         self.sw, self.sh = self.compute_latent_vector_size(opt)
 
@@ -33,23 +34,32 @@ class SPADEGenerator(BaseNetwork):
             # In case of VAE, we will sample from random z vector
             self.fc = nn.Linear(opt.z_dim, 16 * nf * self.sw * self.sh)
         else:
+            # FEATURE: We will always use VAE for feature maps
             # Otherwise, we make the network deterministic by starting with
             # downsampled segmentation map instead of random z
             self.fc = nn.Conv2d(self.opt.semantic_nc, 16 * nf, 3, padding=1)
 
+        opt.feature_nc = feature_nc[6]
         self.head_0 = SPADEResnetBlock(16 * nf, 16 * nf, opt)
 
+        opt.feature_nc = feature_nc[5]
         self.G_middle_0 = SPADEResnetBlock(16 * nf, 16 * nf, opt)
+        opt.feature_nc = feature_nc[4]
         self.G_middle_1 = SPADEResnetBlock(16 * nf, 16 * nf, opt)
 
+        opt.feature_nc = feature_nc[3]
         self.up_0 = SPADEResnetBlock(16 * nf, 8 * nf, opt)
+        opt.feature_nc = feature_nc[2]
         self.up_1 = SPADEResnetBlock(8 * nf, 4 * nf, opt)
+        opt.feature_nc = feature_nc[1]
         self.up_2 = SPADEResnetBlock(4 * nf, 2 * nf, opt)
+        opt.feature_nc = feature_nc[0]
         self.up_3 = SPADEResnetBlock(2 * nf, 1 * nf, opt)
 
         final_nc = nf
 
         if opt.num_upsampling_layers == 'most':
+            opt.feature_nc = feature_nc[0]
             self.up_4 = SPADEResnetBlock(1 * nf, nf // 2, opt)
             final_nc = nf // 2
 
@@ -74,7 +84,7 @@ class SPADEGenerator(BaseNetwork):
         return sw, sh
 
     def forward(self, input, z=None):
-        seg = input
+        features = input
 
         if self.opt.use_vae:
             # we sample z from unit normal and reshape the tensor
@@ -84,33 +94,34 @@ class SPADEGenerator(BaseNetwork):
             x = self.fc(z)
             x = x.view(-1, 16 * self.opt.ngf, self.sh, self.sw)
         else:
+            # FEATURE: We will always use VAE for feature maps
             # we downsample segmap and run convolution
-            x = F.interpolate(seg, size=(self.sh, self.sw))
+            x = F.interpolate(features, size=(self.sh, self.sw))
             x = self.fc(x)
 
-        x = self.head_0(x, seg)
+        x = self.head_0(x, features[6])
 
         x = self.up(x)
-        x = self.G_middle_0(x, seg)
+        x = self.G_middle_0(x, features[5])
 
         if self.opt.num_upsampling_layers == 'more' or \
            self.opt.num_upsampling_layers == 'most':
             x = self.up(x)
 
-        x = self.G_middle_1(x, seg)
+        x = self.G_middle_1(x, features[4])
 
         x = self.up(x)
-        x = self.up_0(x, seg)
+        x = self.up_0(x, features[3])
         x = self.up(x)
-        x = self.up_1(x, seg)
+        x = self.up_1(x, features[2])
         x = self.up(x)
-        x = self.up_2(x, seg)
+        x = self.up_2(x, features[1])
         x = self.up(x)
-        x = self.up_3(x, seg)
+        x = self.up_3(x, features[0])
 
         if self.opt.num_upsampling_layers == 'most':
             x = self.up(x)
-            x = self.up_4(x, seg)
+            x = self.up_4(x, features[0])
 
         x = self.conv_img(F.leaky_relu(x, 2e-1))
         x = F.tanh(x)
@@ -118,6 +129,7 @@ class SPADEGenerator(BaseNetwork):
         return x
 
 
+# FEATURE: Do not use Pix2PixHDGenerator for feature maps
 class Pix2PixHDGenerator(BaseNetwork):
     @staticmethod
     def modify_commandline_options(parser, is_train):
@@ -132,6 +144,7 @@ class Pix2PixHDGenerator(BaseNetwork):
 
     def __init__(self, opt):
         super().__init__()
+        # FEATURE: don't have a fixed label_nc, so not applicable
         input_nc = opt.label_nc + (1 if opt.contain_dontcare_label else 0) + (0 if opt.no_instance else 1)
 
         norm_layer = get_nonspade_norm_layer(opt, opt.norm_G)

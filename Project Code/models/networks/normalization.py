@@ -62,7 +62,8 @@ def get_nonspade_norm_layer(opt, norm_type='instance'):
 # Example |config_text| will be spadesyncbatch3x3, or spadeinstance5x5.
 # Also, the other arguments are
 # |norm_nc|: the #channels of the normalized activations, hence the output dim of SPADE
-# |label_nc|: the #channels of the input semantic map, hence the input dim of SPADE
+# REMOVED: |label_nc|: the #channels of the input semantic map, hence the input dim of SPADE
+# FEATURE: |label_nc|: the #channels of the input feature map, hence the input dim of SPADE
 class SPADE(nn.Module):
     def __init__(self, config_text, norm_nc, label_nc):
         super().__init__()
