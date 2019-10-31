@@ -7,12 +7,13 @@ from data.base_dataset import BaseDataset, get_params, get_transform
 from PIL import Image
 import util.util as util
 import os
+import tensorflow as tf
 
 
 class Pix2pixDataset(BaseDataset):
     @staticmethod
     def modify_commandline_options(parser, is_train):
-        parser.add_argument('--no_pairing_check', action='store_true',
+        parser.add_argument('--no_pairing_check', action='store_false',
                             help='If specified, skip sanity check of correct label-image file pairing')
         return parser
 
@@ -21,10 +22,10 @@ class Pix2pixDataset(BaseDataset):
 
         label_paths, image_paths, instance_paths = self.get_paths(opt)
 
-        util.natural_sort(label_paths)
-        util.natural_sort(image_paths)
-        if not opt.no_instance:
-            util.natural_sort(instance_paths)
+        #util.natural_sort(label_paths)
+        #util.natural_sort(image_paths)
+        #if not opt.no_instance:
+        #    util.natural_sort(instance_paths)
 
         label_paths = label_paths[:opt.max_dataset_size]
         image_paths = image_paths[:opt.max_dataset_size]
@@ -57,36 +58,40 @@ class Pix2pixDataset(BaseDataset):
     def __getitem__(self, index):
         # Label Image
         label_path = self.label_paths[index]
-        label = Image.open(label_path)
-        params = get_params(self.opt, label.size)
-        transform_label = get_transform(self.opt, params, method=Image.NEAREST, normalize=False)
-        label_tensor = transform_label(label) * 255.0
-        label_tensor[label_tensor == 255] = self.opt.label_nc  # 'unknown' is opt.label_nc
+        #label = Image.open(label_path)
+        label=label_path
+        #params = get_params(self.opt, label.size)
+        #transform_label = get_transform(self.opt, params, method=Image.NEAREST, normalize=False)
+        #label_tensor = transform_label(label) * 255.0
+        label_tensor = tf.convert_to_tensor(label)
+        #label_tensor[label_tensor == 255] = self.opt.label_nc  # 'unknown' is opt.label_nc
 
         # input image (real images)
         image_path = self.image_paths[index]
-        assert self.paths_match(label_path, image_path), \
-            "The label_path %s and image_path %s don't match." % \
-            (label_path, image_path)
+        #assert self.paths_match(label_path, image_path), \
+        #    "The label_path %s and image_path %s don't match." % \
+        #    (label_path, image_path)
         image = Image.open(image_path)
+        params = get_params(self.opt, image.size)
         image = image.convert('RGB')
 
         transform_image = get_transform(self.opt, params)
         image_tensor = transform_image(image)
 
+        instance_tensor = 0
         # if using instance maps
-        if self.opt.no_instance:
-            instance_tensor = 0
-        else:
-            instance_path = self.instance_paths[index]
-            instance = Image.open(instance_path)
-            if instance.mode == 'L':
-                instance_tensor = transform_label(instance) * 255
-                instance_tensor = instance_tensor.long()
-            else:
-                instance_tensor = transform_label(instance)
+#        if self.opt.no_instance:
+#            instance_tensor = 0
+#        else:
+#            instance_path = self.instance_paths[index]
+#            instance = Image.open(instance_path)
+#            if instance.mode == 'L':
+#                instance_tensor = transform_label(instance) * 255
+#                instance_tensor = instance_tensor.long()
+#            else:
+#                instance_tensor = transform_label(instance)
 
-        input_dict = {'label': label_tensor,
+        input_dict = {'label': label, #label_tensor,
                       'instance': instance_tensor,
                       'image': image_tensor,
                       'path': image_path,
