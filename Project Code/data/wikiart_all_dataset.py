@@ -7,6 +7,7 @@ from data.pix2pix_dataset import Pix2pixDataset
 from data.image_folder import make_dataset
 import pandas as pd
 from sklearn import preprocessing
+import os
 
 
 class wikiartalldataset(Pix2pixDataset):
@@ -44,6 +45,19 @@ class wikiartalldataset(Pix2pixDataset):
 
         image_dir = opt.image_dir 
         image_paths = (image_dir + 'images/' + summary_file['filename'].str.replace('\\','/')).tolist()
+        
+        tmpImg = []
+        tmpLab = []
+        for i in range(len(image_paths)):
+            if os.path.isfile(image_paths[i]):
+                tmpImg.append(image_paths[i])
+                tmpLab.append(label_paths[i])
+            else:
+                print("Missing file:" + image_paths[i])
+
+        image_paths = tmpImg
+        label_paths = tmpLab
+
 
         #if len(opt.instance_dir) > 0:
         #    instance_dir = opt.instance_dir
