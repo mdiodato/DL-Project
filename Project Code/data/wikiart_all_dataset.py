@@ -8,6 +8,7 @@ from data.image_folder import make_dataset
 import pandas as pd
 from sklearn import preprocessing
 import os
+from PIL import Image
 
 
 class wikiartalldataset(Pix2pixDataset):
@@ -49,12 +50,15 @@ class wikiartalldataset(Pix2pixDataset):
         tmpImg = []
         tmpLab = []
         for i in range(len(image_paths)):
-            if os.path.isfile(image_paths[i]):
-                tmpImg.append(image_paths[i])
-                tmpLab.append(label_paths[i])
-            else:
-                print("Missing file:" + image_paths[i])
-
+            try:
+                if os.path.isfile(image_paths[i]):
+                    tmp = Image.open(image_paths[i])
+                    tmpImg.append(image_paths[i])
+                    tmpLab.append(label_paths[i])
+                else:
+                    print("Missing file:" + image_paths[i])
+            except OSError as e:
+                print("OS Error: " + str(e), "File: " + image_paths[i])
         image_paths = tmpImg
         label_paths = tmpLab
 
