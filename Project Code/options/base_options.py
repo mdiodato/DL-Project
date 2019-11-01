@@ -44,7 +44,7 @@ class BaseOptions():
         parser.add_argument('--image_dir', type=str, default='./datasets/wikiart_all/')
         parser.add_argument('--label_dir', type=str, default='./datasets/wikiart_all/')
         parser.add_argument('--filter_cat', type=str, default='genre')
-        parser.add_argument('--filter_values', nargs ='+', default=['cityscape', 'landscape'])
+        parser.add_argument('--filter_values', nargs ='+', default=['landscape'])
         parser.add_argument('--dataset_mode', type=str, default='wikiart_all')
         parser.add_argument('--serial_batches', action='store_true', help='if true, takes images in order to make batches, otherwise takes them randomly')
         parser.add_argument('--no_flip', action='store_true', help='if specified, do not flip the images for data argumentation')
@@ -68,7 +68,7 @@ class BaseOptions():
         # for instance-wise features
         parser.add_argument('--no_instance', action='store_false', help='if specified, do *not* add instance map as input')
         parser.add_argument('--nef', type=int, default=16, help='# of encoder filters in the first conv layer')
-        parser.add_argument('--use_vae', action='store_true', help='enable training with an image encoder.')
+        parser.add_argument('--use_vae', action='store_false', help='enable training with an image encoder.')
 
         self.initialized = True
         return parser
