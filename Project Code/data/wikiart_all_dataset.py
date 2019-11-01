@@ -43,7 +43,7 @@ class wikiartalldataset(Pix2pixDataset):
         label_paths = le.transform(summary_file[opt.filter_cat])
 
         image_dir = opt.image_dir 
-        image_paths = (image_dir + 'images/' + summary_file['filename']).tolist()
+        image_paths = (image_dir + 'images/' + summary_file['filename'].str.replace('\\','/')).tolist()
 
         #if len(opt.instance_dir) > 0:
         #    instance_dir = opt.instance_dir

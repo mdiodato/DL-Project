@@ -4,7 +4,8 @@ Licensed under the CC BY-NC-SA 4.0 license (https://creativecommons.org/licenses
 """
 
 import os, sys
-sys.path.append(os.path.join(os.path.dirname(__file__), "lib"))
+sys.path.insert(0, '.')
+#sys.path.append(os.path.join(os.path.dirname(__file__), "lib"))
 from collections import OrderedDict
 from options.train_options import TrainOptions
 import data
@@ -17,6 +18,7 @@ opt = TrainOptions().parse()
 
 # print options to help debugging
 print(' '.join(sys.argv))
+print(os.getcwd())
 
 # load the dataset
 dataloader = data.create_dataloader(opt)
