@@ -39,28 +39,20 @@ class SPADEGenerator(BaseNetwork):
             # downsampled segmentation map instead of random z
             self.fc = nn.Conv2d(self.opt.semantic_nc, 16 * nf, 3, padding=1)
 
-        opt.feature_nc = feature_nc[6]
-        self.head_0 = SPADEResnetBlock(16 * nf, 16 * nf, opt)
+        self.head_0 = SPADEResnetBlock(16 * nf, 16 * nf, opt, feature_nc[6])
 
-        opt.feature_nc = feature_nc[5]
-        self.G_middle_0 = SPADEResnetBlock(16 * nf, 16 * nf, opt)
-        opt.feature_nc = feature_nc[4]
-        self.G_middle_1 = SPADEResnetBlock(16 * nf, 16 * nf, opt)
+        self.G_middle_0 = SPADEResnetBlock(16 * nf, 16 * nf, opt, feature_nc[5])
+        self.G_middle_1 = SPADEResnetBlock(16 * nf, 16 * nf, opt, feature_nc[4])
 
-        opt.feature_nc = feature_nc[3]
-        self.up_0 = SPADEResnetBlock(16 * nf, 8 * nf, opt)
-        opt.feature_nc = feature_nc[2]
-        self.up_1 = SPADEResnetBlock(8 * nf, 4 * nf, opt)
-        opt.feature_nc = feature_nc[1]
-        self.up_2 = SPADEResnetBlock(4 * nf, 2 * nf, opt)
-        opt.feature_nc = feature_nc[0]
-        self.up_3 = SPADEResnetBlock(2 * nf, 1 * nf, opt)
+        self.up_0 = SPADEResnetBlock(16 * nf, 8 * nf, opt, feature_nc[3])
+        self.up_1 = SPADEResnetBlock(8 * nf, 4 * nf, opt, feature_nc[2])
+        self.up_2 = SPADEResnetBlock(4 * nf, 2 * nf, opt, feature_nc[1])
+        self.up_3 = SPADEResnetBlock(2 * nf, 1 * nf, opt, feature_nc[0])
 
         final_nc = nf
 
         if opt.num_upsampling_layers == 'most':
-            opt.feature_nc = feature_nc[0]
-            self.up_4 = SPADEResnetBlock(1 * nf, nf // 2, opt)
+            self.up_4 = SPADEResnetBlock(1 * nf, nf // 2, opt, feature_nc[0])
             final_nc = nf // 2
 
         self.conv_img = nn.Conv2d(final_nc, 3, 3, padding=1)
