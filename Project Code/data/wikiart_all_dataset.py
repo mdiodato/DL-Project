@@ -53,6 +53,7 @@ class wikiartalldataset(Pix2pixDataset):
             try:
                 if os.path.isfile(image_paths[i]):
                     tmp = Image.open(image_paths[i])
+                    tmp = tmp.convert('RGB')
                     tmpImg.append(image_paths[i])
                     tmpLab.append(label_paths[i])
                 else:
