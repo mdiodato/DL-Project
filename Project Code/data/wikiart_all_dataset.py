@@ -49,17 +49,22 @@ class wikiartalldataset(Pix2pixDataset):
         
         tmpImg = []
         tmpLab = []
-        for i in range(len(image_paths)):
-            try:
-                if os.path.isfile(image_paths[i]):
-                    tmp = Image.open(image_paths[i])
-                    tmp = tmp.convert('RGB')
-                    tmpImg.append(image_paths[i])
-                    tmpLab.append(label_paths[i])
-                else:
-                    print("Missing file:" + image_paths[i])
-            except OSError as e:
-                print("OS Error: " + str(e), "File: " + image_paths[i])
+        print(image_dir)
+        if 'test' not in image_dir:
+            for i in range(len(image_paths)):
+                try:
+                    if os.path.isfile(image_paths[i]):
+                        tmp = Image.open(image_paths[i])
+                        tmp = tmp.convert('RGB')
+                        tmpImg.append(image_paths[i])
+                        tmpLab.append(label_paths[i])
+                    else:
+                        print("Missing file:" + image_paths[i])
+                except OSError as e:
+                    print("OS Error: " + str(e), "File: " + image_paths[i])
+        else:
+            tmpImg = make_dataset(image_dir, recursive=False, read_cache=True)
+            tmpLab = tmpImg
         image_paths = tmpImg
         label_paths = tmpLab
 

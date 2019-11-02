@@ -3,3 +3,5 @@
 **/*.zip
 **/*.csv
 wikiart-master/**/*.json
+!Project Code/results/**/*.png
+!Project Code/datasets/wikiart_all/tests/*.jpg
