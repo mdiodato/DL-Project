@@ -63,13 +63,15 @@ class wikiartalldataset(Pix2pixDataset):
                         print("Missing file:" + image_paths[i])
                 except OSError as e:
                     print("OS Error: " + str(e), "File: " + image_paths[i])
-            tmpImg = zip(*[iter(tmpImg)]*2)[0]
-            tmoLab = zip(*[iter(tmpLab)]*2)[1]
-            tmpSty = zip(*[iter(tmpImg)]*2)[1]
+            tmpSty = tmpImg[len(tmpImg)//2:]
+            tmpImg = tmpImg[:len(tmpImg)//2]
+            tmpLab = tmpLab[:len(tmpLab)//2]
+            if len(tmpSty) % 2 == 1:
+                tmpSty = tmpSty[:-1]
         else:
             tmpImg = make_dataset(image_dir, recursive=False, read_cache=True)
-            tmpLab = tmpImg
-            tmpSty = tmpImg
+            tmpLab = tmpImg[:]
+            tmpSty = tmpImg[:]
         image_paths = tmpImg
         label_paths = tmpLab
         style_paths = tmpSty
@@ -83,6 +85,7 @@ class wikiartalldataset(Pix2pixDataset):
         instance_paths = []
 
         assert len(label_paths) == len(image_paths), "The #images in %s and %s do not match. Is there something wrong?"
+        #print(len(style_paths), len(image_paths))
         assert len(style_paths) == len(image_paths), "The #images in %s and %s do not match. Is there something wrong?"
 
         return label_paths, image_paths, instance_paths, style_paths

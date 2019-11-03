@@ -119,6 +119,7 @@ class Pix2PixModel(torch.nn.Module):
             # data['label'] = data['label'].cuda()
             # data['instance'] = data['instance'].cuda()
             data['image'] = data['image'].cuda()
+            data['style'] = data['style'].cuda()
 
         # # create one-hot label map
         # label_map = data['label']
