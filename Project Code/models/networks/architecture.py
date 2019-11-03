@@ -164,5 +164,12 @@ class VGG19Features(torch.nn.Module):
         h_relu5 = self.slice5(h_relu4)  # 256 -> 512
         h_relu6 = self.slice6(h_relu5)  # 512 -> 512
         h_relu7 = self.slice7(h_relu6)  # 512 -> 512
-        out = [h_relu1, h_relu2, h_relu3, h_relu4, h_relu5, h_relu6, h_relu7]
+        h_relu1 = torch.normal(mean=0.0, std=0.5, size=h_relu1.size()) + h_relu1
+        h_relu2 = torch.normal(mean=0.0, std=0.5, size=h_relu2.size()) + h_relu2
+        h_relu3 = torch.normal(mean=0.0, std=0.5, size=h_relu3.size()) + h_relu3
+        h_relu4 = torch.normal(mean=0.0, std=0.5, size=h_relu4.size()) + h_relu4
+        h_relu5 = torch.normal(mean=0.0, std=0.5, size=h_relu5.size()) + h_relu5
+        h_relu6 = torch.normal(mean=0.0, std=0.5, size=h_relu6.size()) + h_relu6
+        h_relu7 = torch.normal(mean=0.0, std=0.5, size=h_relu7.size()) + h_relu7
+        out = [h_relu1.detach(), h_relu2.detach(), h_relu3.detach(), h_relu4.detach(), h_relu5.detach(), h_relu6.detach(), h_relu7.detach()]
         return out
