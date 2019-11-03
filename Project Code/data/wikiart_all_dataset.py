@@ -50,7 +50,7 @@ class wikiartalldataset(Pix2pixDataset):
         tmpImg = []
         tmpLab = []
         print(image_dir)
-        if 'wikiart_all' in image_dir:
+        if image_dir == "./datasets/wikiart_all/":
             for i in range(len(image_paths)):
                 try:
                     if os.path.isfile(image_paths[i]):
