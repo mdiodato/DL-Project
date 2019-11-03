@@ -132,7 +132,7 @@ class Pix2PixModel(torch.nn.Module):
         #     input_semantics = torch.cat((input_semantics, instance_edge_map), dim=1)
 
         # create feature maps
-        input_features = self.features(data['image'])
+        input_features = self.features([data['image'][0], data['image'][1]])
 
         return input_features, data['image']
 
