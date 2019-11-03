@@ -5,5 +5,6 @@
 wikiart-master/**/*.json
 !Project\ Code/results/**/*/
 !Project\ Code/results/**/*.png
-!Project\ Code/datasets/wikiart_all/tests/*.jpg
+!Project\ Code/datasets/wikiart_all/test*/*.jpg
+!Project\ Code/datasets/wikiart_all/test*/*.png
 !Project\ Code/results/**/*
