@@ -164,12 +164,12 @@ class VGG19Features(torch.nn.Module):
         h_relu5 = self.slice5(h_relu4)  # 256 -> 512
         h_relu6 = self.slice6(h_relu5)  # 512 -> 512
         h_relu7 = self.slice7(h_relu6)  # 512 -> 512
-        h_relu1 = torch.empty(h_relu1.size()).normal(mean=0.0, std=0.5) + h_relu1
-        h_relu2 = torch.empty(h_relu2.size()).normal(mean=0.0, std=0.5) + h_relu2
-        h_relu3 = torch.empty(h_relu3.size()).normal(mean=0.0, std=0.5) + h_relu3
-        h_relu4 = torch.empty(h_relu4.size()).normal(mean=0.0, std=0.5) + h_relu4
-        h_relu5 = torch.empty(h_relu5.size()).normal(mean=0.0, std=0.5) + h_relu5
-        h_relu6 = torch.empty(h_relu6.size()).normal(mean=0.0, std=0.5) + h_relu6
-        h_relu7 = torch.empty(h_relu7.size()).normal(mean=0.0, std=0.5) + h_relu7
+        h_relu1 = torch.empty(h_relu1.size(), device = 'cuda').normal_(mean=0.0, std=0.5) + h_relu1
+        h_relu2 = torch.empty(h_relu2.size(), device = 'cuda').normal_(mean=0.0, std=0.5) + h_relu2
+        h_relu3 = torch.empty(h_relu3.size(), device = 'cuda').normal_(mean=0.0, std=0.5) + h_relu3
+        h_relu4 = torch.empty(h_relu4.size(), device = 'cuda').normal_(mean=0.0, std=0.5) + h_relu4
+        h_relu5 = torch.empty(h_relu5.size(), device = 'cuda').normal_(mean=0.0, std=0.5) + h_relu5
+        h_relu6 = torch.empty(h_relu6.size(), device = 'cuda').normal_(mean=0.0, std=0.5) + h_relu6
+        h_relu7 = torch.empty(h_relu7.size(), device = 'cuda').normal_(mean=0.0, std=0.5) + h_relu7
         out = [h_relu1.detach(), h_relu2.detach(), h_relu3.detach(), h_relu4.detach(), h_relu5.detach(), h_relu6.detach(), h_relu7.detach()]
         return out
