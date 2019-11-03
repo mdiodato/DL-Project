@@ -164,5 +164,5 @@ class VGG19Features(torch.nn.Module):
         h_relu5 = self.slice5(h_relu4)  # 256 -> 512
         h_relu6 = self.slice6(h_relu5)  # 512 -> 512
         h_relu7 = self.slice7(h_relu6)  # 512 -> 512
-        out = [h_relu1, h_relu2, h_relu3, h_relu4, h_relu5, h_relu6, h_relu7]
+        out = [h_relu1]
         return out
