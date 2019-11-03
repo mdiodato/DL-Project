@@ -97,7 +97,7 @@ def tensor2im(image_tensor, imtype=np.uint8, normalize=True, tile=False):
 
 # Converts a one-hot tensor into a colorful label map
 def tensor2label(label_tensor, n_label, imtype=np.uint8, tile=False):
-    if label_tensor.dim() == 4:
+    if type(label_tensor) != list and label_tensor.dim() == 4:
         # transform each image in the batch
         images_np = []
         for b in range(label_tensor.size(0)):
@@ -112,7 +112,7 @@ def tensor2label(label_tensor, n_label, imtype=np.uint8, tile=False):
             images_np = images_np[0]
             return images_np
 
-    if label_tensor.dim() == 1:
+    if type(label_tensor) == list or label_tensor.dim() == 1:
         return np.zeros((64, 64, 3), dtype=np.uint8)
     if n_label == 0:
         return tensor2im(label_tensor, imtype)

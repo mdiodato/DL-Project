@@ -135,10 +135,11 @@ class Pix2PixModel(torch.nn.Module):
         #     input_semantics = torch.cat((input_semantics, instance_edge_map), dim=1)
 
         # create feature maps
-        print(data["image"].size())
-        input_features = self.features(torch.unsqueeze(data["image"][1],0))
+        input_features = self.features(data["image"])
+        #print(data["image"].size())
+        #input_features = self.features(torch.unsqueeze(data["image"][1],0))
 
-        data['image'] = torch.cat([torch.unsqueeze(data['image'][0],0), torch.unsqueeze(data['image'][0],0)],0).cuda()
+        #data['image'] = torch.cat([torch.unsqueeze(data['image'][0],0), torch.unsqueeze(data['image'][0],0)],0).cuda()
         return input_features, data['image']    
 
     def compute_generator_loss(self, input_features, real_image):
