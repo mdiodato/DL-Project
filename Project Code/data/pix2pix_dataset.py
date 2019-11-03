@@ -20,7 +20,7 @@ class Pix2pixDataset(BaseDataset):
     def initialize(self, opt):
         self.opt = opt
 
-        label_paths, image_paths, instance_paths = self.get_paths(opt)
+        label_paths, image_paths, instance_paths, style_paths = self.get_paths(opt)
 
         #util.natural_sort(label_paths)
         #util.natural_sort(image_paths)
@@ -30,6 +30,7 @@ class Pix2pixDataset(BaseDataset):
         label_paths = label_paths[:opt.max_dataset_size]
         image_paths = image_paths[:opt.max_dataset_size]
         instance_paths = instance_paths[:opt.max_dataset_size]
+        style_paths = style_paths[:opt.max_dataset_size]
 
         if not opt.no_pairing_check:
             for path1, path2 in zip(label_paths, image_paths):
@@ -39,6 +40,7 @@ class Pix2pixDataset(BaseDataset):
         self.label_paths = label_paths
         self.image_paths = image_paths
         self.instance_paths = instance_paths
+        self.style_paths = style_paths
 
         size = len(self.image_paths)
         self.dataset_size = size
@@ -77,6 +79,14 @@ class Pix2pixDataset(BaseDataset):
 
         transform_image = get_transform(self.opt, params)
         image_tensor = transform_image(image)
+        
+        # style image for features
+        style_path = self.style_paths[index]
+        style = Image.open(style_path)
+        params = get_params(self.opt, style.size)
+        style = style.convert('RGB')
+        transform_style = get_transform(self.opt, params)
+        style_tensor = transform_image(style)
 
         instance_tensor = 0
         # if using instance maps
@@ -94,6 +104,7 @@ class Pix2pixDataset(BaseDataset):
         input_dict = {'label': label, #label_tensor,
                       'instance': instance_tensor,
                       'image': image_tensor,
+                      'style': style_tensor,
                       'path': image_path,
                       }
 
