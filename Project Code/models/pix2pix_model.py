@@ -43,7 +43,7 @@ class Pix2PixModel(torch.nn.Module):
     # routines based on |mode|.
     def forward(self, data, mode):
         input_features, real_image = self.preprocess_input(data)
-		input_features = torch.cat([torch.unsqueeze(input_features[1],0),torch.unsqueeze(input_features[1],0)])
+        input_features = torch.cat([torch.unsqueeze(input_features[1],0),torch.unsqueeze(input_features[1],0)])
 
         if mode == 'generator':
             g_loss, generated = self.compute_generator_loss(
