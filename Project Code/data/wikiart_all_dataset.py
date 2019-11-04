@@ -66,8 +66,12 @@ class wikiartalldataset(Pix2pixDataset):
             tmpSty = tmpImg[len(tmpImg)//2:]
             tmpImg = tmpImg[:len(tmpImg)//2]
             tmpLab = tmpLab[:len(tmpLab)//2]
-            if len(tmpSty) % 2 == 1:
-                tmpSty = tmpSty[:-1]
+            if len(tmpSty) != len(tmpImg):
+                print("Style size is uneven:", len(tmpSty), len(tmpImg))
+                if len(tmpSty) > len(tmpImg):
+                    tmpSty = tmpSty[:-1]
+                else:
+                    tmpImg = tmpImg[:-1]
         else:
             tmpImg = make_dataset(image_dir, recursive=False, read_cache=True)
             tmpLab = tmpImg[:]
