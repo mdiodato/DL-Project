@@ -25,7 +25,7 @@ class wikiartalldataset(Pix2pixDataset):
         parser.set_defaults(load_size=load_size)
         parser.set_defaults(crop_size=256)
         parser.set_defaults(display_winsize=256)
-        parser.set_defaults(label_nc=13)
+        #parser.set_defaults(label_nc=13)
         parser.set_defaults(contain_dontcare_label=False)
 
         #parser.add_argument('--label_dir', type=str, required=True,
@@ -37,44 +37,61 @@ class wikiartalldataset(Pix2pixDataset):
         return parser
 
     def get_paths(self, opt):
-        label_dir = opt.label_dir
-        sumamry_file = pd.read_csv(label_dir+'summary.csv', low_memory=False)
-        summary_file = sumamry_file[sumamry_file[opt.filter_cat].isin(opt.filter_values)]
-        le = preprocessing.LabelEncoder()
-        le.fit(summary_file[opt.filter_cat])
-        label_paths = le.transform(summary_file[opt.filter_cat])
-
-        image_dir = opt.image_dir 
-        image_paths = (image_dir + 'images/' + summary_file['filename'].str.replace('\\','/')).tolist()
+		if opt.isTrain:
+			image_dir_real = opt.image_dir_real 
+			image_dir_guide = opt.image_dir_guide 
+			
+			summary_file_real = pd.read_csv(image_dir_real+'summary.csv', low_memory=False)
+			summary_file_real = summary_file_real[summary_file_real[opt.filter_cat_real].isin(opt.filter_values_real)]
+			
+			summary_file_guide = pd.read_csv(image_dir_guide+'summary.csv', low_memory=False)
+			summary_file_guide = summary_file_guide[summary_file_guide[opt.filter_cat_guide].isin(opt.filter_values_guide)]
+			
+			image_paths_real = (image_dir_real + 'images/' + summary_file['filename'].str.replace('\\','/')).tolist()
+			image_paths_guide = (image_dir_guide + 'images/' + summary_file['filename'].str.replace('\\','/')).tolist()
+			
+			le_real = preprocessing.LabelEncoder()
+			le_guide = preprocessing.LabelEncoder()
+			
+			le_real.fit(summary_file_real[opt.filter_cat_real])
+			label_paths_real = le_real.transform(summary_file_real[opt.filter_cat_real])
+			
+			le_guide.fit(summary_file_guide[opt.filter_cat_guide])
+			label_paths_guide = le_guide.transform(summary_file_guide[opt.filter_cat_guide])
         
         tmpImg = []
         tmpLab = []
         tmpSty = []
-        print(image_dir)
-        if image_dir == "./datasets/wikiart_all/":
-            for i in range(len(image_paths)):
+		tmpLabReal = []
+		tmpLabGuide= []
+        if opt.test_load:
+            for i in range(min(len(image_paths_real), len(image_paths_guide))):
                 try:
-                    if os.path.isfile(image_paths[i]):
-                        tmp = Image.open(image_paths[i])
+                    if os.path.isfile(image_paths_real[i]) and os.path.isfile(image_paths_guide[i]):
+                        tmp = Image.open(image_paths_real[i])
                         tmp = tmp.convert('RGB')
-                        tmpImg.append(image_paths[i])
-                        tmpLab.append(label_paths[i])
+						tmp = Image.open(image_paths_guide[i])
+                        tmp = tmp.convert('RGB')
+                        tmpImg.append(image_paths_real[i])
+                        tmpLab.append(label_paths_real[i])
+						tmpSty.append(image_paths_guide[i])
+						tmpLabReal.append(label_paths_real[i])
+						tmpLabGuide.append(label_paths_guide[i])
                     else:
-                        print("Missing file:" + image_paths[i])
+                        print("Missing files:", image_paths_real[i], image_paths_guide[i])
                 except OSError as e:
-                    print("OS Error: " + str(e), "File: " + image_paths[i])
-            tmpSty = tmpImg[len(tmpImg)//2:]
-            tmpImg = tmpImg[:len(tmpImg)//2]
-            tmpLab = tmpLab[:len(tmpLab)//2]
-            if len(tmpSty) % 2 == 1:
-                tmpSty = tmpSty[:-1]
+                    print("OS Error: " + str(e), "File: " + image_paths_real[i], "File: " + image_paths_guide[i])
         else:
             tmpImg = make_dataset(image_dir, recursive=False, read_cache=True)
             tmpLab = tmpImg[:]
             tmpSty = tmpImg[:]
+			tmpLabReal = tmpImg[:]
+			tmpLabGuide = tmpImg[:]
         image_paths = tmpImg
         label_paths = tmpLab
         style_paths = tmpSty
+		label_real = tmpLabReal
+		label_guide = tmpLabGuide
 
 
         #if len(opt.instance_dir) > 0:
@@ -85,7 +102,6 @@ class wikiartalldataset(Pix2pixDataset):
         instance_paths = []
 
         assert len(label_paths) == len(image_paths), "The #images in %s and %s do not match. Is there something wrong?"
-        #print(len(style_paths), len(image_paths))
         assert len(style_paths) == len(image_paths), "The #images in %s and %s do not match. Is there something wrong?"
 
-        return label_paths, image_paths, instance_paths, style_paths
+        return label_paths, image_paths, instance_paths, style_paths, label_real, label_guide
