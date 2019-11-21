@@ -73,6 +73,7 @@ class BaseOptions():
         parser.add_argument('--no_instance', action='store_false', help='if specified, do *not* add instance map as input')
         parser.add_argument('--nef', type=int, default=16, help='# of encoder filters in the first conv layer')
         parser.add_argument('--use_vae', action='store_false', help='enable training with an image encoder.')
+        parser.add_argument('--use_noise', action='store_false', help='use random noise as input to the generator.')
 
         self.initialized = True
         return parser
