@@ -8,6 +8,7 @@ from PIL import Image
 import util.util as util
 import os
 import tensorflow as tf
+from random import shuffle
 
 
 class Pix2pixDataset(BaseDataset):
@@ -31,8 +32,8 @@ class Pix2pixDataset(BaseDataset):
         image_paths = image_paths[:opt.max_dataset_size]
         instance_paths = instance_paths[:opt.max_dataset_size]
         style_paths = style_paths[:opt.max_dataset_size]
-		label_real = label_real[:opt.max_dataset_size]
-		label_guide = label_guide[:opt.max_dataset_size]
+        label_real = label_real[:opt.max_dataset_size]
+        label_guide = label_guide[:opt.max_dataset_size]
 
         if not opt.no_pairing_check:
             for path1, path2 in zip(label_paths, image_paths):
@@ -43,8 +44,8 @@ class Pix2pixDataset(BaseDataset):
         self.image_paths = image_paths
         self.instance_paths = instance_paths
         self.style_paths = style_paths
-		self.label_real = label_real
-		self.label_guide = label_guide
+        self.label_real = label_real
+        self.label_guide = label_guide
 
         size = len(self.image_paths)
         self.dataset_size = size
@@ -88,10 +89,10 @@ class Pix2pixDataset(BaseDataset):
         style = style.convert('RGB')
         transform_style = get_transform(self.opt, params)
         style_tensor = transform_image(style)
-		
-		# Labels
-		label_real = self.label_real[index]
-		label_guide = self.label_guide[index]
+        
+        # Labels
+        label_real = self.label_real[index]
+        label_guide = self.label_guide[index]
 
         instance_tensor = 0
         # if using instance maps
@@ -110,8 +111,8 @@ class Pix2pixDataset(BaseDataset):
                       'instance': instance_tensor,
                       'image': image_tensor,
                       'style': style_tensor,
-					  'label_guide': label_guide,
-					  'label_real': label_real,
+                      'label_guide': label_guide,
+                      'label_real': label_real,
                       'path': image_path,
                       }
 
@@ -119,6 +120,17 @@ class Pix2pixDataset(BaseDataset):
         self.postprocess(input_dict)
 
         return input_dict
+        
+    def shuffle(self):
+        if self.opt.shuffle_pairs:
+            temp = list(zip(self.image_paths, self.label_real)) 
+            shuffle(temp) 
+            self.image_paths, self.label_real = zip(*temp)
+            
+            temp = list(zip(self.style_paths, self.label_guide)) 
+            shuffle(temp) 
+            self.style_paths, self.label_guide = zip(*temp)
+            
 
     def postprocess(self, input_dict):
         return input_dict

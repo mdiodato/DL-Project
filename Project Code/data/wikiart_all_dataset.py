@@ -37,46 +37,46 @@ class wikiartalldataset(Pix2pixDataset):
         return parser
 
     def get_paths(self, opt):
-		if opt.isTrain:
-			image_dir_real = opt.image_dir_real 
-			image_dir_guide = opt.image_dir_guide 
-			
-			summary_file_real = pd.read_csv(image_dir_real+'summary.csv', low_memory=False)
-			summary_file_real = summary_file_real[summary_file_real[opt.filter_cat_real].isin(opt.filter_values_real)]
-			
-			summary_file_guide = pd.read_csv(image_dir_guide+'summary.csv', low_memory=False)
-			summary_file_guide = summary_file_guide[summary_file_guide[opt.filter_cat_guide].isin(opt.filter_values_guide)]
-			
-			image_paths_real = (image_dir_real + 'images/' + summary_file['filename'].str.replace('\\','/')).tolist()
-			image_paths_guide = (image_dir_guide + 'images/' + summary_file['filename'].str.replace('\\','/')).tolist()
-			
-			le_real = preprocessing.LabelEncoder()
-			le_guide = preprocessing.LabelEncoder()
-			
-			le_real.fit(summary_file_real[opt.filter_cat_real])
-			label_paths_real = le_real.transform(summary_file_real[opt.filter_cat_real])
-			
-			le_guide.fit(summary_file_guide[opt.filter_cat_guide])
-			label_paths_guide = le_guide.transform(summary_file_guide[opt.filter_cat_guide])
+        if opt.isTrain:
+            image_dir_real = opt.image_dir_real 
+            image_dir_guide = opt.image_dir_guide 
+            
+            summary_file_real = pd.read_csv(image_dir_real+'summary.csv', low_memory=False)
+            summary_file_real = summary_file_real[summary_file_real[opt.filter_cat_real].isin(opt.filter_values_real)]
+            
+            summary_file_guide = pd.read_csv(image_dir_guide+'summary.csv', low_memory=False)
+            summary_file_guide = summary_file_guide[summary_file_guide[opt.filter_cat_guide].isin(opt.filter_values_guide)]
+            
+            image_paths_real = (image_dir_real + 'images/' + summary_file['filename'].str.replace('\\','/')).tolist()
+            image_paths_guide = (image_dir_guide + 'images/' + summary_file['filename'].str.replace('\\','/')).tolist()
+            
+            le_real = preprocessing.LabelEncoder()
+            le_guide = preprocessing.LabelEncoder()
+            
+            le_real.fit(summary_file_real[opt.filter_cat_real])
+            label_paths_real = le_real.transform(summary_file_real[opt.filter_cat_real])
+            
+            le_guide.fit(summary_file_guide[opt.filter_cat_guide])
+            label_paths_guide = le_guide.transform(summary_file_guide[opt.filter_cat_guide])
         
         tmpImg = []
         tmpLab = []
         tmpSty = []
-		tmpLabReal = []
-		tmpLabGuide= []
+        tmpLabReal = []
+        tmpLabGuide= []
         if opt.test_load:
             for i in range(min(len(image_paths_real), len(image_paths_guide))):
                 try:
                     if os.path.isfile(image_paths_real[i]) and os.path.isfile(image_paths_guide[i]):
                         tmp = Image.open(image_paths_real[i])
                         tmp = tmp.convert('RGB')
-						tmp = Image.open(image_paths_guide[i])
+                        tmp = Image.open(image_paths_guide[i])
                         tmp = tmp.convert('RGB')
                         tmpImg.append(image_paths_real[i])
                         tmpLab.append(label_paths_real[i])
-						tmpSty.append(image_paths_guide[i])
-						tmpLabReal.append(label_paths_real[i])
-						tmpLabGuide.append(label_paths_guide[i])
+                        tmpSty.append(image_paths_guide[i])
+                        tmpLabReal.append(label_paths_real[i])
+                        tmpLabGuide.append(label_paths_guide[i])
                     else:
                         print("Missing files:", image_paths_real[i], image_paths_guide[i])
                 except OSError as e:
@@ -85,13 +85,13 @@ class wikiartalldataset(Pix2pixDataset):
             tmpImg = make_dataset(image_dir, recursive=False, read_cache=True)
             tmpLab = tmpImg[:]
             tmpSty = tmpImg[:]
-			tmpLabReal = tmpImg[:]
-			tmpLabGuide = tmpImg[:]
+            tmpLabReal = tmpImg[:]
+            tmpLabGuide = tmpImg[:]
         image_paths = tmpImg
         label_paths = tmpLab
         style_paths = tmpSty
-		label_real = tmpLabReal
-		label_guide = tmpLabGuide
+        label_real = tmpLabReal
+        label_guide = tmpLabGuide
 
 
         #if len(opt.instance_dir) > 0:

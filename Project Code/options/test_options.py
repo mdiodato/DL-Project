@@ -10,7 +10,7 @@ class TestOptions(BaseOptions):
     def initialize(self, parser):
         BaseOptions.initialize(self, parser)
         parser.add_argument('--results_dir', type=str, default='./results/', help='saves results here.')
-		parser.add_argument('--test_image_folder', type=str, default='./datasets/wikiart_all/tests/')
+        parser.add_argument('--test_image_folder', type=str, default='./datasets/wikiart_all/tests/')
         parser.add_argument('--which_epoch', type=str, default='latest', help='which epoch to load? set to latest to use latest cached model')
         parser.add_argument('--how_many', type=int, default=float("inf"), help='how many test images to run')
 
