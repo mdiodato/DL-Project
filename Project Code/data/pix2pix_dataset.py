@@ -20,7 +20,7 @@ class Pix2pixDataset(BaseDataset):
     def initialize(self, opt):
         self.opt = opt
 
-        label_paths, image_paths, instance_paths, style_paths = self.get_paths(opt)
+        label_paths, image_paths, instance_paths, style_paths, label_real, label_guide = self.get_paths(opt)
 
         #util.natural_sort(label_paths)
         #util.natural_sort(image_paths)
@@ -31,6 +31,8 @@ class Pix2pixDataset(BaseDataset):
         image_paths = image_paths[:opt.max_dataset_size]
         instance_paths = instance_paths[:opt.max_dataset_size]
         style_paths = style_paths[:opt.max_dataset_size]
+		label_real = label_real[:opt.max_dataset_size]
+		label_guide = label_guide[:opt.max_dataset_size]
 
         if not opt.no_pairing_check:
             for path1, path2 in zip(label_paths, image_paths):
@@ -41,6 +43,8 @@ class Pix2pixDataset(BaseDataset):
         self.image_paths = image_paths
         self.instance_paths = instance_paths
         self.style_paths = style_paths
+		self.label_real = label_real
+		self.label_guide = label_guide
 
         size = len(self.image_paths)
         self.dataset_size = size
@@ -70,9 +74,6 @@ class Pix2pixDataset(BaseDataset):
 
         # input image (real images)
         image_path = self.image_paths[index]
-        #assert self.paths_match(label_path, image_path), \
-        #    "The label_path %s and image_path %s don't match." % \
-        #    (label_path, image_path)
         image = Image.open(image_path)
         params = get_params(self.opt, image.size)
         image = image.convert('RGB')
@@ -87,6 +88,10 @@ class Pix2pixDataset(BaseDataset):
         style = style.convert('RGB')
         transform_style = get_transform(self.opt, params)
         style_tensor = transform_image(style)
+		
+		# Labels
+		label_real = self.label_real[index]
+		label_guide = self.label_guide[index]
 
         instance_tensor = 0
         # if using instance maps
@@ -105,6 +110,8 @@ class Pix2pixDataset(BaseDataset):
                       'instance': instance_tensor,
                       'image': image_tensor,
                       'style': style_tensor,
+					  'label_guide': label_guide,
+					  'label_real': label_real,
                       'path': image_path,
                       }
 
