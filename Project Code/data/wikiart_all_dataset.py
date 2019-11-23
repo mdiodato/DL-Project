@@ -100,7 +100,15 @@ class wikiartalldataset(Pix2pixDataset):
         #else:
         #   instance_paths = []
         instance_paths = []
+        
+        print("Real Image filters:", opt.filter_cat_real, opt.filter_values_real)
+        le_name_mapping = dict(zip(le_real.classes_, le_real.transform(le_real.classes_)))
+        print(le_name_mapping)
 
+        print("Guide Image filters:", opt.filter_cat_guide, opt.filter_values_guide)
+        le_name_mapping = dict(zip(le_guide.classes_, le_guide.transform(le_guide.classes_)))
+        print(le_name_mapping)
+        
         assert len(label_paths) == len(image_paths), "The #images in %s and %s do not match. Is there something wrong?"
         assert len(style_paths) == len(image_paths), "The #images in %s and %s do not match. Is there something wrong?"
 
