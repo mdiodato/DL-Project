@@ -77,7 +77,7 @@ class SPADEGenerator(BaseNetwork):
 
         return sw, sh
 
-    def forward(self, input, label, z=None):
+    def forward(self, input, label_real, z=None):
         features = input
 
         if self.opt.use_vae or self.opt.use_noise:
@@ -86,7 +86,7 @@ class SPADEGenerator(BaseNetwork):
                 z = torch.randn(input.size(0), self.opt.z_dim,
                                 dtype=torch.float32, device=input.get_device())
             # FEATURE: concatenate label encoding and the z vector
-            l = self.fc_label(label)
+            l = self.fc_label(label_real)
             x = torch.cat((z, l), dim=1)
             x = self.fc(x)
             x = x.view(-1, 16 * self.opt.ngf, self.sh, self.sw)
