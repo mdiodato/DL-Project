@@ -79,6 +79,7 @@ class SPADEGenerator(BaseNetwork):
 
     def forward(self, input, label_real, z=None):
         features = input
+        label_real = label_real.long()
 
         if self.opt.use_vae or self.opt.use_noise:
             # we sample z from unit normal and reshape the tensor
