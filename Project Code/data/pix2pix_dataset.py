@@ -120,16 +120,6 @@ class Pix2pixDataset(BaseDataset):
         self.postprocess(input_dict)
 
         return input_dict
-        
-    def shuffle(self):
-        if self.opt.shuffle_pairs:
-            temp = list(zip(self.image_paths, self.label_real)) 
-            shuffle(temp) 
-            self.image_paths, self.label_real = zip(*temp)
-            
-            temp = list(zip(self.style_paths, self.label_guide)) 
-            shuffle(temp) 
-            self.style_paths, self.label_guide = zip(*temp)
             
 
     def postprocess(self, input_dict):
