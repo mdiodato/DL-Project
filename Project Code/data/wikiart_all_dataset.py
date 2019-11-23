@@ -113,13 +113,3 @@ class wikiartalldataset(Pix2pixDataset):
         assert len(style_paths) == len(image_paths), "The #images in %s and %s do not match. Is there something wrong?"
 
         return label_paths, image_paths, instance_paths, style_paths, label_real, label_guide
-        
-    def shuffle(self):
-        if self.opt.shuffle_pairs:
-            temp = list(zip(self.image_paths, self.label_real)) 
-            shuffle(temp) 
-            self.image_paths, self.label_real = zip(*temp)
-            
-            temp = list(zip(self.style_paths, self.label_guide)) 
-            shuffle(temp) 
-            self.style_paths, self.label_guide = zip(*temp)
