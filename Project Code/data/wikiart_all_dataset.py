@@ -35,6 +35,16 @@ class wikiartalldataset(Pix2pixDataset):
         #parser.add_argument('--instance_dir', type=str, default='',
         #                    help='path to the directory that contains instance maps. Leave black if not exists')
         return parser
+    
+    def shuffle(self):
+        if self.opt.shuffle_pairs:
+            temp = list(zip(self.image_paths, self.label_real)) 
+            shuffle(temp) 
+            self.image_paths, self.label_real = zip(*temp)
+            
+            temp = list(zip(self.style_paths, self.label_guide)) 
+            shuffle(temp) 
+            self.style_paths, self.label_guide = zip(*temp)
 
     def get_paths(self, opt):
         if opt.isTrain:
