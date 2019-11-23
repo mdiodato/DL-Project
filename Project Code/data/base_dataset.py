@@ -85,16 +85,6 @@ def normalize():
 def __resize(img, w, h, method=Image.BICUBIC):
     return img.resize((w, h), method)
 
-def shuffle(self):
-    if self.opt.shuffle_pairs:
-        temp = list(zip(self.image_paths, self.label_real)) 
-        shuffle(temp) 
-        self.image_paths, self.label_real = zip(*temp)
-        
-        temp = list(zip(self.style_paths, self.label_guide)) 
-        shuffle(temp) 
-        self.style_paths, self.label_guide = zip(*temp)
-
 
 def __make_power_2(img, base, method=Image.BICUBIC):
     ow, oh = img.size
