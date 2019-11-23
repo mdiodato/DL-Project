@@ -47,8 +47,8 @@ class wikiartalldataset(Pix2pixDataset):
             summary_file_guide = pd.read_csv(image_dir_guide+'summary.csv', low_memory=False)
             summary_file_guide = summary_file_guide[summary_file_guide[opt.filter_cat_guide].isin(opt.filter_values_guide)]
             
-            image_paths_real = (image_dir_real + 'images/' + summary_file['filename'].str.replace('\\','/')).tolist()
-            image_paths_guide = (image_dir_guide + 'images/' + summary_file['filename'].str.replace('\\','/')).tolist()
+            image_paths_real = (image_dir_real + 'images/' + summary_file_real['filename'].str.replace('\\','/')).tolist()
+            image_paths_guide = (image_dir_guide + 'images/' + summary_file_guide['filename'].str.replace('\\','/')).tolist()
             
             le_real = preprocessing.LabelEncoder()
             le_guide = preprocessing.LabelEncoder()
@@ -65,7 +65,7 @@ class wikiartalldataset(Pix2pixDataset):
         tmpLabReal = []
         tmpLabGuide= []
         if opt.test_load:
-            for i in range(min(len(image_paths_real), len(image_paths_guide))):
+            for i in range(min(len(image_paths_real), len(image_paths_guide), opt.max_dataset_size)):
                 try:
                     if os.path.isfile(image_paths_real[i]) and os.path.isfile(image_paths_guide[i]):
                         tmp = Image.open(image_paths_real[i])
