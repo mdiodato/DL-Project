@@ -34,7 +34,7 @@ class SPADEGenerator(BaseNetwork):
             # In case of VAE, we will sample from random z vector
             # FEATURE: The label input is encoded to the same dimension as the z vector
             self.fc_label = nn.Linear(1, opt.z_dim)
-            self.fc = nn.Linear(opt.z_dim, 16 * nf * self.sw * self.sh)
+            self.fc = nn.Linear(opt.z_dim*2, 16 * nf * self.sw * self.sh)
         else:
             # FEATURE: We will always use VAE or random noise for feature maps
             # Otherwise, we make the network deterministic by starting with
@@ -86,20 +86,23 @@ class SPADEGenerator(BaseNetwork):
                 z = torch.randn(input.size(0), self.opt.z_dim,
                                 dtype=torch.float32, device=input.get_device())
             # FEATURE: concatenate label encoding and the z vector
-            print(label_real.size())
-            l = self.fc_label(label_real.unsqueeze_(1))
-            x = torch.cat((z, l), dim=0)
+            #print(label_real.size())
+            l = self.fc_label(label_real)
+            #print(z.size(), l.size())
+            x = torch.cat((z, l), dim=1)
+            #print(x.size())
             x = self.fc(x)
+            #print(x.size())
             x = x.view(-1, 16 * self.opt.ngf, self.sh, self.sw)
-            print(x.size())
+            #print(x.size())
         else:
             # FEATURE: We will always use VAE for feature maps
             # we downsample segmap and run convolution
             x = F.interpolate(features, size=(self.sh, self.sw))
             x = self.fc(x)
-            print(x.size())
+            #print(x.size())
 
-        print(features[6].size())
+        #print(features[6].size())
         x = self.head_0(x, features[6])
 
         x = self.up(x)

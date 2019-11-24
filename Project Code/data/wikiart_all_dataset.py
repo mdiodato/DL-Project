@@ -8,6 +8,7 @@ from data.image_folder import make_dataset
 import pandas as pd
 from sklearn import preprocessing
 import os
+import numpy as np
 from PIL import Image
 
 
@@ -68,12 +69,17 @@ class wikiartalldataset(Pix2pixDataset):
             
             le_guide.fit(summary_file_guide[opt.filter_cat_guide])
             label_paths_guide = le_guide.transform(summary_file_guide[opt.filter_cat_guide])
+        else:
+            image_paths_real = make_dataset(image_dir, recursive=False, read_cache=True)
+            image_paths_guide = tmpImg[:]
+            label_paths_real = tmpImg[:]
+            label_paths_guide = tmpImg[:]
         
         tmpImg = []
         tmpLab = []
         tmpSty = []
         tmpLabReal = []
-        tmpLabGuide= []
+        tmpLabGuide = []
         if opt.test_load:
             for i in range(min(len(image_paths_real), len(image_paths_guide), opt.max_dataset_size)):
                 try:
@@ -85,18 +91,19 @@ class wikiartalldataset(Pix2pixDataset):
                         tmpImg.append(image_paths_real[i])
                         tmpLab.append(label_paths_real[i])
                         tmpSty.append(image_paths_guide[i])
-                        tmpLabReal.append(label_paths_real[i])
-                        tmpLabGuide.append(label_paths_guide[i])
+                        tmpLabReal.append(np.asarray(label_paths_real[i]))
+                        tmpLabGuide.append(np.asarray(label_paths_guide[i]))
                     else:
                         print("Missing files:", image_paths_real[i], image_paths_guide[i])
                 except OSError as e:
                     print("OS Error: " + str(e), "File: " + image_paths_real[i], "File: " + image_paths_guide[i])
         else:
-            tmpImg = make_dataset(image_dir, recursive=False, read_cache=True)
-            tmpLab = tmpImg[:]
-            tmpSty = tmpImg[:]
-            tmpLabReal = tmpImg[:]
-            tmpLabGuide = tmpImg[:]
+            for i in range(min(len(image_paths_real), len(image_paths_guide))):
+                tmpImg.append(image_paths_real[i])
+                tmpLab.append(label_paths_real[i])
+                tmpSty.append(image_paths_guide[i])
+                tmpLabReal.append(label_paths_real[i])
+                tmpLabGuide.append(label_paths_guide[i])
         image_paths = tmpImg
         label_paths = tmpLab
         style_paths = tmpSty

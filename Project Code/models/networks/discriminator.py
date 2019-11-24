@@ -112,6 +112,7 @@ class NLayerDiscriminator(BaseNetwork):
     def forward(self, input):
         results = [input]
         for submodel in self.children():
+            #print(results[-1].size())
             intermediate_output = submodel(results[-1])
             results.append(intermediate_output)
 

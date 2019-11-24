@@ -7,6 +7,7 @@ from data.base_dataset import BaseDataset, get_params, get_transform
 from PIL import Image
 import util.util as util
 import os
+import numpy as np
 import tensorflow as tf
 from random import shuffle
 
@@ -91,8 +92,8 @@ class Pix2pixDataset(BaseDataset):
         style_tensor = transform_image(style)
         
         # Labels
-        label_real = self.label_real[index]
-        label_guide = self.label_guide[index]
+        label_real = np.expand_dims(self.label_real[index], axis = 1)
+        label_guide = np.expand_dims(self.label_guide[index], axis = 1)
 
         instance_tensor = 0
         # if using instance maps
