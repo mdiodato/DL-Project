@@ -105,8 +105,8 @@ class NLayerDiscriminator(BaseNetwork):
         #     input_nc += 1
         # if not opt.no_instance:
         #     input_nc += 1
-        # FEATURE: no label_nc, no concatenation
-        input_nc = opt.output_nc
+        # FEATURE: label_nc is 1
+        input_nc = 1 + opt.output_nc
         return input_nc
 
     def forward(self, input):
