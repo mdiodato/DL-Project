@@ -1,0 +1,75 @@
+            D_steps_per_G: 1                             
+             aspect_ratio: 1.0                           
+                batchSize: 4                             	[default: 1]
+                    beta1: 0.5                           
+                    beta2: 0.999                         
+      cache_filelist_read: False                         
+     cache_filelist_write: False                         
+          checkpoints_dir: ./checkpoints                 
+   contain_dontcare_label: False                         
+           continue_train: False                         
+                crop_size: 256                           
+                 dataroot: ./datasets/wikiart_all/       
+             dataset_mode: wikiart_all                   
+                    debug: False                         
+             display_freq: 100                           
+          display_winsize: 256                           
+         filter_cat_guide: genre                         	[default: style]
+          filter_cat_real: style                         	[default: genre]
+      filter_values_guide: ['landscape']                 	[default: ['impressionism']]
+       filter_values_real: ['Post-Impressionism', 'Impressionism', 'Abstract Art']	[default: ['landscape']]
+                 gan_mode: hinge                         
+                  gpu_ids: 0                             
+          image_dir_guide: ./datasets/wikiart_all/       
+           image_dir_real: ./datasets/wikiart_all/       
+                init_type: xavier                        
+            init_variance: 0.02                          
+                  isTrain: True                          	[default: None]
+                label_dir: ./datasets/wikiart_all/       
+                 label_nc: 182                           
+              lambda_feat: 10.0                          
+               lambda_kld: 0.05                          
+               lambda_vgg: 10.0                          
+       load_from_opt_file: False                         
+                load_size: 286                           
+                       lr: 0.0002                        
+         max_dataset_size: 2000                          	[default: 9223372036854775807]
+                    model: pix2pix                       
+                 nThreads: 0                             
+               n_layers_D: 4                             
+                     name: Landscape on Styles           	[default: label2wikiart-all]
+                      ndf: 64                            
+                      nef: 16                            
+                     netD: multiscale                    
+             netD_subarch: n_layer                       
+                     netG: spade                         
+                      ngf: 64                            
+                    niter: 20                            	[default: 50]
+              niter_decay: 0                             
+                  no_TTUR: False                         
+                  no_flip: False                         
+          no_ganFeat_loss: False                         
+                  no_html: False                         
+              no_instance: True                          
+         no_pairing_check: True                          
+              no_vgg_loss: False                         
+                   norm_D: spectralinstance              
+                   norm_E: spectralinstance              
+                   norm_G: spectralspadesyncbatch3x3     
+                    num_D: 2                             
+    num_upsampling_layers: normal                        
+                optimizer: adam                          
+                output_nc: 3                             
+                    phase: train                         
+          preprocess_mode: resize_and_crop               
+               print_freq: 100                           
+          save_epoch_freq: 10                            
+         save_latest_freq: 5000                          
+           serial_batches: False                         
+            shuffle_pairs: True                          
+                test_load: True                          
+                   tf_log: False                         
+                use_noise: True                          
+                  use_vae: True                          
+              which_epoch: latest                        
+                    z_dim: 256                           
