@@ -222,7 +222,7 @@ class Pix2PixModel(torch.nn.Module):
     # for each fake and real image.
 
     def discriminate(self, input_features, fake_image, real_image, label_real):
-        print(label_real.size())
+        #print(label_real.size())
         # FEATURE: concatenate label with images
         _, _, h, w = real_image.size()
         label_tensor = label_real.view(-1, 1, 1, 1).expand(-1, 1, h, w)
