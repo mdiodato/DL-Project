@@ -54,13 +54,20 @@ class wikiartalldataset(Pix2pixDataset):
             
             summary_file_real = pd.read_csv(image_dir_real+'summary.csv', low_memory=False)
             summary_file_real = summary_file_real[summary_file_real[opt.filter_cat_real].isin(opt.filter_values_real)]
-            
+            summary_file_real = summary_file_real.sample(frac=1).reset_index(drop=True)
+            summary_file_real = summary_file_real.drop_duplicates('filename')
+
             summary_file_guide = pd.read_csv(image_dir_guide+'summary.csv', low_memory=False)
             summary_file_guide = summary_file_guide[summary_file_guide[opt.filter_cat_guide].isin(opt.filter_values_guide)]
-            
+            summary_file_guide = summary_file_guide.sample(frac=1).reset_index(drop=True)
+            summary_file_guide = summary_file_guide.drop_duplicates('filename')
+
             image_paths_real = (image_dir_real + 'images/' + summary_file_real['filename'].str.replace('\\','/')).tolist()
             image_paths_guide = (image_dir_guide + 'images/' + summary_file_guide['filename'].str.replace('\\','/')).tolist()
             
+            print('Real images: ', len(image_paths_real))
+            print('Guide images: ', len(image_paths_guide))
+
             le_real = preprocessing.LabelEncoder()
             le_guide = preprocessing.LabelEncoder()
             
@@ -70,10 +77,10 @@ class wikiartalldataset(Pix2pixDataset):
             le_guide.fit(summary_file_guide[opt.filter_cat_guide])
             label_paths_guide = le_guide.transform(summary_file_guide[opt.filter_cat_guide])
         else:
-            image_paths_real = make_dataset(image_dir, recursive=False, read_cache=True)
-            image_paths_guide = tmpImg[:]
-            label_paths_real = tmpImg[:]
-            label_paths_guide = tmpImg[:]
+            image_paths_real = make_dataset(opt.test_image_folder, recursive=False, read_cache=True)
+            image_paths_guide = image_paths_real[:]
+            label_paths_real = [opt.real_label] * len(image_paths_real)
+            label_paths_guide = [opt.guide_label] * len(image_paths_guide)
         
         tmpImg = []
         tmpLab = []
@@ -81,6 +88,7 @@ class wikiartalldataset(Pix2pixDataset):
         tmpLabReal = []
         tmpLabGuide = []
         if opt.test_load:
+            print("Testing dataset of:", min(len(image_paths_real), len(image_paths_guide), opt.max_dataset_size))
             for i in range(min(len(image_paths_real), len(image_paths_guide), opt.max_dataset_size)):
                 try:
                     if os.path.isfile(image_paths_real[i]) and os.path.isfile(image_paths_guide[i]):
@@ -91,8 +99,8 @@ class wikiartalldataset(Pix2pixDataset):
                         tmpImg.append(image_paths_real[i])
                         tmpLab.append(label_paths_real[i])
                         tmpSty.append(image_paths_guide[i])
-                        tmpLabReal.append(np.asarray(label_paths_real[i]))
-                        tmpLabGuide.append(np.asarray(label_paths_guide[i]))
+                        tmpLabReal.append(label_paths_real[i])
+                        tmpLabGuide.append(label_paths_guide[i])
                     else:
                         print("Missing files:", image_paths_real[i], image_paths_guide[i])
                 except OSError as e:
@@ -116,17 +124,40 @@ class wikiartalldataset(Pix2pixDataset):
         #    instance_paths = make_dataset(instance_dir, recursive=False, read_cache=True)
         #else:
         #   instance_paths = []
-        instance_paths = []
+        instance_paths = image_paths
         
-        print("Real Image filters:", opt.filter_cat_real, opt.filter_values_real)
-        le_name_mapping = dict(zip(le_real.classes_, le_real.transform(le_real.classes_)))
-        print(le_name_mapping)
+        if opt.isTrain:
+            print("Real Image filters:", opt.filter_cat_real, opt.filter_values_real)
+            le_name_mapping = dict(zip(le_real.classes_, le_real.transform(le_real.classes_)))
+            print(le_name_mapping)
 
-        print("Guide Image filters:", opt.filter_cat_guide, opt.filter_values_guide)
-        le_name_mapping = dict(zip(le_guide.classes_, le_guide.transform(le_guide.classes_)))
-        print(le_name_mapping)
+            print("Guide Image filters:", opt.filter_cat_guide, opt.filter_values_guide)
+            le_name_mapping = dict(zip(le_guide.classes_, le_guide.transform(le_guide.classes_)))
+            print(le_name_mapping)
         
         assert len(label_paths) == len(image_paths), "The #images in %s and %s do not match. Is there something wrong?"
         assert len(style_paths) == len(image_paths), "The #images in %s and %s do not match. Is there something wrong?"
 
+        if opt.isTrain:
+            self.save_data(opt, label_paths, image_paths, instance_paths, style_paths, label_real, label_guide)
+
+
         return label_paths, image_paths, instance_paths, style_paths, label_real, label_guide
+
+
+    def save_file_path(self, opt, makedir=False):
+        expr_dir = os.path.join(opt.checkpoints_dir, opt.name)
+        if makedir:
+            util.mkdirs(expr_dir)
+        file_name = os.path.join(expr_dir, 'dataload')
+        return file_name
+
+    def save_data(self,opt, label_paths, image_paths, instance_paths, style_paths, label_real, label_guide):
+        df = pd.DataFrame({'label_paths': label_paths, 
+            'image_paths': image_paths, 
+            'instance_paths': instance_paths, 
+            'style_paths': style_paths, 
+            'label_real': label_real,
+            'label_guide': label_guide})
+        filename = self.save_file_path(opt)
+        df.to_csv(filename + '.csv')

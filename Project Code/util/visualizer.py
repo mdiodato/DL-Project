@@ -136,7 +136,7 @@ class Visualizer():
         return visuals
 
     # save image to the disk
-    def save_images(self, webpage, visuals, image_path):        
+    def save_images(self, webpage, visuals, image_path, real_label):        
         visuals = self.convert_visuals_to_numpy(visuals)        
         
         image_dir = webpage.get_image_dir()
@@ -150,7 +150,8 @@ class Visualizer():
 
         for label, image_numpy in visuals.items():
             image_name = os.path.join(label, '%s.png' % (name))
-            save_path = os.path.join(image_dir, image_name)
+            save_path = os.path.join(image_dir, str(real_label))
+            save_path = os.path.join(save_path, image_name)
             util.save_image(image_numpy, save_path, create_dir=True)
 
             ims.append(image_name)

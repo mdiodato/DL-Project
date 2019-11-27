@@ -13,6 +13,8 @@ class TestOptions(BaseOptions):
         parser.add_argument('--test_image_folder', type=str, default='./datasets/wikiart_all/tests/')
         parser.add_argument('--which_epoch', type=str, default='latest', help='which epoch to load? set to latest to use latest cached model')
         parser.add_argument('--how_many', type=int, default=float("inf"), help='how many test images to run')
+        parser.add_argument('--real_label', type=int, default=0, help='real ID to test')
+        parser.add_argument('--guide_label', type=int, default=0, help='guide ID to test')
 
         parser.set_defaults(preprocess_mode='scale_width_and_crop', crop_size=256, load_size=256, display_winsize=256)
         parser.set_defaults(serial_batches=True)
