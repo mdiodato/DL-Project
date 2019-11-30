@@ -115,6 +115,7 @@ class Pix2pixDataset(BaseDataset):
                       'label_guide': label_guide,
                       'label_real': label_real,
                       'path': image_path,
+                      'guide_path': style_path
                       }
 
         # Give subclasses a chance to modify the final output

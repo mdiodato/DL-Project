@@ -35,14 +35,14 @@ for i, data_i in enumerate(dataloader):
 
     generated = model(data_i, mode='inference')
 
-    img_path = data_i['path']
+    img_path = data_i['guide_path']
     for b in range(generated.shape[0]):
-        print('process image... %s' % img_path[b])
+        print('process image... %s ... %s' % (img_path[b], data_i['path'][b]))
         #visuals = OrderedDict([('input_label', data_i['label'][b]),
         #                       ('synthesized_image', generated[b])])
         visuals = OrderedDict([('input_label', generated[b]),
                                 ('synthesized_image', generated[b]),
-                                ('real_image', data_i['image'][b])])
-        visualizer.save_images(webpage, visuals, img_path[b:b + 1], opt.real_label)
+                                ('real_image', data_i['style'][b])])
+        visualizer.save_images(webpage, visuals, img_path[b:b + 1], opt.real_label, data_i['path'][b:b+1])
 
 webpage.save()

@@ -136,7 +136,7 @@ class Visualizer():
         return visuals
 
     # save image to the disk
-    def save_images(self, webpage, visuals, image_path, real_label):        
+    def save_images(self, webpage, visuals, image_path, real_label, real_path):        
         visuals = self.convert_visuals_to_numpy(visuals)        
         
         image_dir = webpage.get_image_dir()
@@ -149,8 +149,15 @@ class Visualizer():
         links = []
 
         for label, image_numpy in visuals.items():
-            image_name = os.path.join(label, '%s.png' % (name))
-            save_path = os.path.join(image_dir, str(real_label))
+            if 'synthesized' in label:
+                image_name = os.path.join(label, '%s.png' % (name))
+                save_path = os.path.join(image_dir, str(real_label))
+                save_path = os.path.join(save_path, os.path.splitext(ntpath.basename(real_path[0]))[0])
+            elif 'real_image' in label:
+                image_name = os.path.join(label, '%s.png' % (name))
+                save_path = os.path.join(image_dir, 'Real')
+            else:
+                continue
             save_path = os.path.join(save_path, image_name)
             util.save_image(image_numpy, save_path, create_dir=True)
 

@@ -77,8 +77,11 @@ class wikiartalldataset(Pix2pixDataset):
             le_guide.fit(summary_file_guide[opt.filter_cat_guide])
             label_paths_guide = le_guide.transform(summary_file_guide[opt.filter_cat_guide])
         else:
-            image_paths_real = make_dataset(opt.test_image_folder, recursive=False, read_cache=True)
-            image_paths_guide = image_paths_real[:]
+            image_paths_real = make_dataset(opt.test_image_folder_real, recursive=False, read_cache=True)
+            image_paths_guide = make_dataset(opt.test_image_folder_guide, recursive=False, read_cache=True)
+            tmp = len(image_paths_real)
+            image_paths_real = [ele for ele in image_paths_real for _ in range(len(image_paths_guide))]
+            image_paths_guide = image_paths_guide * tmp
             label_paths_real = [opt.real_label] * len(image_paths_real)
             label_paths_guide = [opt.guide_label] * len(image_paths_guide)
         
@@ -88,7 +91,7 @@ class wikiartalldataset(Pix2pixDataset):
         tmpLabReal = []
         tmpLabGuide = []
         if opt.test_load:
-            print("Testing dataset of:", min(len(image_paths_real), len(image_paths_guide), opt.max_dataset_size))
+            print("Training dataset of:", min(len(image_paths_real), len(image_paths_guide), opt.max_dataset_size))
             for i in range(min(len(image_paths_real), len(image_paths_guide), opt.max_dataset_size)):
                 try:
                     if os.path.isfile(image_paths_real[i]) and os.path.isfile(image_paths_guide[i]):
