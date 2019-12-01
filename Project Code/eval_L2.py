@@ -27,7 +27,7 @@ load_data = pd.read_csv(save_file_path(opt) + '.csv')
 #dataloader = data.create_dataloader(opt)
 print('Loaded information data file')
 
-test_images_folder = './results/' + opt.name + '/test_' + str(opt.which_epoch) + '/images/'
+test_images_folder = './results/' + opt.name + '/test_' + str(opt.which_epoch) + '/'
 test_images = make_dataset(test_images_folder, recursive=True)
 test_images_all = [x for x in test_images if 'synthesized_image' in x]
 print('Loaded test images')

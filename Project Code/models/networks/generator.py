@@ -83,8 +83,8 @@ class SPADEGenerator(BaseNetwork):
         if self.opt.use_vae or self.opt.use_noise:
             # we sample z from unit normal and reshape the tensor
             if z is None:
-                z = torch.randn(input.size(0), self.opt.z_dim,
-                                dtype=torch.float32, device=input.get_device())
+                z = torch.randn((input[0].size()[0], self.opt.z_dim),
+                                dtype=torch.float32, device=input[0].get_device())
             # FEATURE: concatenate label encoding and the z vector
             #print(label_real.size())
             l = self.fc_label(label_real)
