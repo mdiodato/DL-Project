@@ -3,6 +3,7 @@
 **/*.zip
 **/*.csv
 **/*.pth
+**/*.xlsx
 wikiart-master/**/*.json
 !Project\ Code/results/**/*/
 !Project\ Code/results/**/*.png
