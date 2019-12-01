@@ -79,6 +79,15 @@ class wikiartalldataset(Pix2pixDataset):
         else:
             image_paths_real = make_dataset(opt.test_image_folder_real, recursive=False, read_cache=True)
             image_paths_guide = make_dataset(opt.test_image_folder_guide, recursive=False, read_cache=True)
+            if opt.dataloader_file != '':
+                dataloader_file = pd.read_csv(opt.dataloader_file)
+                image_paths_real_tmp = []
+                for path in image_paths_real:
+                    filename = os.path.basename(path)
+                    label = dataloader_file[dataloader_file['image_paths'].str.contains(filename)]['label_real'].tolist()[0]
+                    if label == opt.real_label:
+                        image_paths_real_tmp.append(path)
+                image_paths_real = image_paths_real_tmp
             tmp = len(image_paths_real)
             image_paths_real = [ele for ele in image_paths_real for _ in range(len(image_paths_guide))]
             image_paths_guide = image_paths_guide * tmp
